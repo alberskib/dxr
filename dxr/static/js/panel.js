@@ -1,6 +1,4 @@
 $(function() {
-    var panelContent = $('#panel-content');
-
     /**
      * Toggles the ARIA expanded and hidden attributes' state.
      *
@@ -9,25 +7,16 @@ $(function() {
     function toggleAria(elem) {
         var expandedState = elem.attr('aria-expanded') === 'true' ? 'false' : 'true';
         var hiddenState = elem.attr('aria-hidden') === 'true' ? 'false' : 'true';
-        elem.attr('aria-hidden', state);
-        elem.attr('aria-expanded', state);
+        elem.attr('aria-hidden', hiddenState);
+        elem.attr('aria-expanded', expandedState);
     }
 
-    // Only show the navigation header/toggle if
-    // there is actual content to show.
-    if (panelContent.length > 0) {
-        var panelToggle = $('#panel-toggle');
-        var panel = panelToggle.parents('.panel');
+    $('#panel-toggle').click(function(event) {
+        var panelContent = $('#panel-content');
+        var icon = $('.navpanel-icon', this);
 
-        panel.show();
-
-        panelToggle.click(function(event) {
-            var panelContent = $(this).next();
-            var icon = $('.navpanel-icon', this);
-
-            icon.toggleClass('expanded');
-            panelContent.slideToggle();
-            toggleAria(panelContent);
-        });
-    }
+        icon.toggleClass('expanded');
+        panelContent.toggle();
+        toggleAria(panelContent);
+    });
 });

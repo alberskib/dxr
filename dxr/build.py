@@ -35,7 +35,6 @@ except ImportError:
     def compress(data, selectors):
         return (d for d, s in izip(data, selectors) if s)
 
-
 def linked_pathname(path, tree_name):
     """Return a list of (server-relative URL, subtree name) tuples that can be
     used to display linked path components in the headers of file or folder
@@ -112,7 +111,8 @@ def build_instance(config_path, nb_jobs=None, tree=None, verbose=False):
                                     for t in config.trees)),
              wwwroot=repr(config.wwwroot),
              generated_date=repr(config.generated_date),
-             directory_index=repr(config.directory_index)))
+             directory_index=repr(config.directory_index),
+             default_tree=repr(config.default_tree)))
 
     # Create jinja cache folder in target folder
     ensure_folder(os.path.join(config.target_folder, 'jinja_dxr_cache'))
@@ -332,17 +332,18 @@ def build_folder(tree, conn, folder, indexed_files, indexed_folders):
          'tree_tuples': [(t.name,
                           browse_url(t.name, tree.config.wwwroot, folder),
                           t.description)
-                         for t in tree.config.trees],
+                         for t in tree.config.sorted_tree_order],
          'generated_date': tree.config.generated_date,
          'paths_and_names': linked_pathname(folder, tree.name),
          'filters': filter_menu_items(),
+         # Autofocus only at the root of each tree:
+         'should_autofocus_query': folder == '',
 
          # Folder template variables:
          'name': name,
          'path': folder,
          'folders': folders,
          'files': files})
-
 
 def _join_url(*args):
     """Join URL path segments with "/", skipping empty segments."""
@@ -541,7 +542,7 @@ def htmlify(tree, conn, icon, path, text, dst_path, plugins):
         'tree_tuples': [(t.name,
                          browse_url(t.name, tree.config.wwwroot, path),
                          t.description)
-                        for t in tree.config.trees],
+                        for t in tree.config.sorted_tree_order],
         'generated_date': tree.config.generated_date,
         'filters': filter_menu_items(),
 
